@@ -1,0 +1,9 @@
+{
+    "regions": [
+        "Rotterdam",
+        "Vooschoten"
+    ],
+    "interval": 120,
+    "api_url": "https://api.buienradar.nl/data/public/2.0/jsonfeed",
+    "olisto_connector": "https://connect.triggi.com/c/<REPLACE_ME>"
+}
