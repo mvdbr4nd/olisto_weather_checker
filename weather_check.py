@@ -28,6 +28,13 @@ def check_weather(data):
                 except BaseException:
                     logger.error("Error parsing reponse from KNMI")
 
+        if data['pilight_enabled']:
+            try:
+                os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], max_sunpower))
+            except:
+                logger.error("Failed to update pilight")
+                pass
+
         if check_weather.last_sunpower != max_sunpower:
             logger.debug("Got new sunpower %s"%(max_sunpower))
             check_weather.last_sunpower = max_sunpower
