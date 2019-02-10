@@ -19,18 +19,32 @@ def check_weather(data):
     if page.status_code == 200:
         res = json.loads(page.text)
         max_sunpower = float(0)
+        max_windstoten = float(0)
+        max_wind = float(0)
         for ws in res['actual']['stationmeasurements']:
             if ws['regio'] in data['regions']:
                 try:
                     sunpower = float(ws['sunpower'])
                     if (sunpower > max_sunpower):
                         max_sunpower = sunpower
+
+                    wind = float(ws['windspeed'])
+                    if (wind > max_wind):
+                        max_wind = wind
+
+                    windstoten = float(ws['windgusts'])
+                    if windstoten > max_windstoten:
+                        max_windstoten = windstoten					
+
                 except BaseException:
                     logger.error("Error parsing reponse from KNMI")
 
         if data['pilight_enabled']:
             try:
-                os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], max_sunpower))
+#                os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], max_sunpower))
+#                sleep(1)
+                print("pilight-send -p generic_label -i %s -l '%s MS, %s MS'"%(data['pilight_wind_label'], max_wind, max_windstoten))
+                os.system("pilight-send -p generic_label -i %s -l '%s MS, %s MS'"%(data['pilight_wind_label'], max_wind, max_windstoten))
             except:
                 logger.error("Failed to update pilight")
                 pass
