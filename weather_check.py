@@ -12,21 +12,18 @@ logger = logging.getLogger(__name__)
 
 def check_weather(data):
 
-    # get the max sunpower for the station above
-    # zonintensiteitWM2
-
     page = requests.get(data['api_url'])
     if page.status_code == 200:
         res = json.loads(page.text)
-        max_sunpower = float(0)
+        sum_sunpower = float(0)
         max_windstoten = float(0)
         max_wind = float(0)
+        sum_temp = float(0)
+        sum_humidity = float(0)
         for ws in res['actual']['stationmeasurements']:
             if ws['regio'] in data['regions']:
                 try:
-                    sunpower = float(ws['sunpower'])
-                    if (sunpower > max_sunpower):
-                        max_sunpower = sunpower
+                    sum_sunpower += float(ws['sunpower'])
 
                     wind = float(ws['windspeed'])
                     if (wind > max_wind):
@@ -36,23 +33,32 @@ def check_weather(data):
                     if windstoten > max_windstoten:
                         max_windstoten = windstoten					
 
+                    sum_temp += float(ws['temperature'])
+                    sum_humidity += float(ws['humidity'])
+   
                 except BaseException:
                     logger.error("Error parsing reponse from KNMI")
 
+
         if data['pilight_enabled']:
+            avg_temp = round(float(sum_temp / float(len(data['regions']))),2)
+            avg_sunpower = round(float(sum_sunpower / float(len(data['regions']))),2)
+            avg_humidity = round(float(sum_humidity / float(len(data['regions']))),2)
             try:
-#                os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], max_sunpower))
-#                sleep(1)
-                print("pilight-send -p generic_label -i %s -l '%s MS, %s MS'"%(data['pilight_wind_label'], max_wind, max_windstoten))
+                os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], avg_sunpower))
+                print("update sun power")
                 os.system("pilight-send -p generic_label -i %s -l '%s MS, %s MS'"%(data['pilight_wind_label'], max_wind, max_windstoten))
+                print("update wind")
+                os.system("pilight-send -p generic_label -i %s -l '%s Celsius'"%(data['pilight_temp_label'], avg_temp))
+                print("update temperature")
             except:
                 logger.error("Failed to update pilight")
                 pass
 
-        if check_weather.last_sunpower != max_sunpower:
-            logger.debug("Got new sunpower %s"%(max_sunpower))
-            check_weather.last_sunpower = max_sunpower
-            url = '%s?value=%s'%(data['olisto_connector'], max_sunpower)
+        if check_weather.last_sunpower != avg_sunpower:
+            logger.debug("Got new sunpower %s"%(avg_sunpower))
+            check_weather.last_sunpower = avg_sunpower
+            url = '%s?value=%s'%(data['olisto_connector'], avg_sunpower)
             requests.post(url)
     else:
         logger.error("failed to get weather data")
