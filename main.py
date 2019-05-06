@@ -53,7 +53,7 @@ if __name__ == '__main__':
     logger.info("Starting Olisto Weather checker")
 
     try:
-        with open('weather_check.json') as data_file:
+        with open('config.json') as data_file:
             data = json.load(data_file)
     except FileNotFoundError:
         logger.error("Failed to open configuration, create the configuration file: weather_check.json")
