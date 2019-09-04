@@ -24,6 +24,7 @@ def check_weather(data):
             if ws['regio'] in data['regions']:
                 try:
                     sum_sunpower += float(ws['sunpower'])
+                    print(sum_sunpower)
 
                     wind = float(ws['windspeed'])
                     if (wind > max_wind):
@@ -41,9 +42,9 @@ def check_weather(data):
 
 
         if data['pilight_enabled']:
-            avg_temp = round(float(sum_temp / float(len(data['regions']))),2)
-            avg_sunpower = round(float(sum_sunpower / float(len(data['regions']))),2)
-            avg_humidity = round(float(sum_humidity / float(len(data['regions']))),2)
+            avg_temp = round(float(sum_temp / float(len(data['regions']))),1)
+            avg_sunpower = round(float(sum_sunpower / float(len(data['regions']))),1)
+            avg_humidity = round(float(sum_humidity / float(len(data['regions']))),1)
             try:
                 os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], avg_sunpower))
                 print("update sun power")
@@ -67,20 +68,20 @@ check_weather.last_sunpower = 0
 
 if __name__ == '__main__':
     handler = RotatingFileHandler(
-        'weather_check.log',
+        '/var/log/weather_check.log',
         maxBytes=100000,
-        backupCount=30)
-    handler.setLevel(logging.DEBUG)
+        backupCount=0)
+    handler.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s - %(name)-22s - %(levelname)-8s - %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     handler_stdout = logging.StreamHandler(sys.stdout)
     logger.addHandler(handler_stdout)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     logger.info("Starting Olisto Weather checker")
 
     try:
-        with open('weather_check.json') as data_file:
+        with open('config.json') as data_file:
             data = json.load(data_file)
     except FileNotFoundError:
         logger.error("Failed to open configuration, create the configuration file: weather_check.json")
