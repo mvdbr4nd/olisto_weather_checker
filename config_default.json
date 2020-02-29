@@ -5,5 +5,10 @@
     ],
     "interval": 120,
     "api_url": "https://api.buienradar.nl/data/public/2.0/jsonfeed",
-    "olisto_connector": "https://connect.triggi.com/c/<REPLACE_ME>"
+    "olisto_connector": "https://connect.triggi.com/c/<REPLACE_ME>",
+    "pilight_enabled": true,
+    "pilight_label": 301,
+    "pilight_wind_label": 302,
+    "pilight_temp_label": 303,
+    "pilight_timestamp_label": 304
 }
