@@ -11,7 +11,7 @@ from logging.handlers import RotatingFileHandler
 logger = logging.getLogger(__name__)
 
 def check_weather(data):
-
+    logger.debug("checking weather")
     page = requests.get(data['api_url'])
     if page.status_code == 200:
         res = json.loads(page.text)
@@ -20,12 +20,12 @@ def check_weather(data):
         max_wind = float(0)
         sum_temp = float(0)
         sum_humidity = float(0)
+        logger.debug("find weather stations")
         for ws in res['actual']['stationmeasurements']:
             if ws['regio'] in data['regions']:
                 try:
                     sum_sunpower += float(ws['sunpower'])
-                    print(sum_sunpower)
-
+                    
                     wind = float(ws['windspeed'])
                     if (wind > max_wind):
                         max_wind = wind
@@ -47,22 +47,24 @@ def check_weather(data):
             avg_humidity = round(float(sum_humidity / float(len(data['regions']))),1)
             try:
                 os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], avg_sunpower))
-                print("update sun power")
+                logger.debug("update sun power")
                 os.system("pilight-send -p generic_label -i %s -l '%s MS, %s MS'"%(data['pilight_wind_label'], max_wind, max_windstoten))
-                print("update wind")
+                logger.debug("update wind")
                 os.system("pilight-send -p generic_label -i %s -l '%s Celsius'"%(data['pilight_temp_label'], avg_temp))
-                print("update temperature")
+                logger.debug("update temperature")
             except:
                 logger.error("Failed to update pilight")
                 pass
 
-        if check_weather.last_sunpower != avg_sunpower:
-            logger.debug("Got new sunpower %s"%(avg_sunpower))
-            check_weather.last_sunpower = avg_sunpower
-            url = '%s?value=%s'%(data['olisto_connector'], avg_sunpower)
-            requests.post(url)
+        #if check_weather.last_sunpower != avg_sunpower:
+        #    logger.debug("Got new sunpower %s"%(avg_sunpower))
+        #    check_weather.last_sunpower = avg_sunpower
+        #    url = '%s?value=%s'%(data['olisto_connector'], avg_sunpower)
+        #    requests.post(url)
     else:
         logger.error("failed to get weather data")
+
+    logger.debug("weather updated")
 
 check_weather.last_sunpower = 0
 
@@ -71,13 +73,13 @@ if __name__ == '__main__':
         '/var/log/weather_check.log',
         maxBytes=100000,
         backupCount=0)
-    handler.setLevel(logging.INFO)
+    handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter("%(asctime)s - %(name)-22s - %(levelname)-8s - %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     handler_stdout = logging.StreamHandler(sys.stdout)
     logger.addHandler(handler_stdout)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.info("Starting Olisto Weather checker")
 
     try:
