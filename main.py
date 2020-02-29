@@ -53,7 +53,7 @@ def check_weather(data):
                 logger.debug("update wind")
                 os.system("pilight-send -p generic_label -i %s -l '%s Celsius'"%(data['pilight_temp_label'], avg_temp))
                 print("update temperature")
-                os.system("pilight-send -p generic_label -i %s -l '%s Last update'"%(data['pilight_timestamp_label'], datetime.now()))
+                os.system("pilight-send -p generic_label -i %s -l '%s Last update'"%(data['pilight_timestamp_label'], datetime.now().timestamp()))
                 print("update timestamp")
             
             except:
