@@ -6,6 +6,7 @@ import sys
 import json
 import time
 import logging
+import datetime
 from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger(__name__)
@@ -42,16 +43,29 @@ def check_weather(data):
 
 
         if data['pilight_enabled']:
+<<<<<<< HEAD:main.py
             avg_temp = round(float(sum_temp / float(len(data['regions']))),1)
             avg_sunpower = round(float(sum_sunpower / float(len(data['regions']))),1)
             avg_humidity = round(float(sum_humidity / float(len(data['regions']))),1)
+=======
+            avg_temp = round(float(sum_temp / float(len(data['regions']))),2)
+            avg_sunpower = round(float(sum_sunpower / float(len(data['regions']))),2)
+            #avg_humidity = round(float(sum_humidity / float(len(data['regions']))),2)
+>>>>>>> 5947297514466a6788a0949a91d66678cb913115:main.py
             try:
                 os.system("pilight-send -p generic_label -i %s -l '%s MW2'"%(data['pilight_label'], avg_sunpower))
                 logger.debug("update sun power")
                 os.system("pilight-send -p generic_label -i %s -l '%s MS, %s MS'"%(data['pilight_wind_label'], max_wind, max_windstoten))
                 logger.debug("update wind")
                 os.system("pilight-send -p generic_label -i %s -l '%s Celsius'"%(data['pilight_temp_label'], avg_temp))
+<<<<<<< HEAD:main.py
                 logger.debug("update temperature")
+=======
+                print("update temperature")
+                os.system("pilight-send -p generic_label -i %s -l '%s Last update'"%(data['pilight_timestamp_label'], datetime.now()))
+                print("update timestamp")
+            
+>>>>>>> 5947297514466a6788a0949a91d66678cb913115:main.py
             except:
                 logger.error("Failed to update pilight")
                 pass
