@@ -60,11 +60,6 @@ def check_weather(data):
                 logger.error("Failed to update pilight")
                 pass
 
-        #if check_weather.last_sunpower != avg_sunpower:
-        #    logger.debug("Got new sunpower %s"%(avg_sunpower))
-        #    check_weather.last_sunpower = avg_sunpower
-        #    url = '%s?value=%s'%(data['olisto_connector'], avg_sunpower)
-        #    requests.post(url)
     else:
         logger.error("failed to get weather data")
 

@@ -1,5 +1,5 @@
-# olisto_weather_checker
-olisto connector updater for weather data (KNMI / using buienradar json rest api)
+# weather_checker
+connector updater for weather data (KNMI / using buienradar json rest api)
 
 This program can be used to update a olisto connector with Sunpower coming from a list or single KNMI station. the data is fetched from using the rest api. Compared and updated to olisto if needed.
 
